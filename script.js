@@ -1,19 +1,22 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// SUBSTITUA PELOS DADOS DO SEU FIREBASE
+// Seus dados reais inseridos aqui
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyD3UMwRrFBB9WqHZ4pvghwFNn4rw2kVv50",
   authDomain: "pront-ai.firebaseapp.com",
   projectId: "pront-ai",
-  appId: "1:..."
+  storageBucket: "pront-ai.firebasestorage.app",
+  messagingSenderId: "356777790012",
+  appId: "1:356777790012:web:53d4e536bb38d742f09139",
+  measurementId: "G-BZK224C6L5"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Elementos
+// Elementos DOM
 const btnGoogle = document.getElementById('btnGoogle');
 const btnLogout = document.getElementById('btnLogout');
 const btnGenerate = document.getElementById('btnGenerate');
@@ -23,7 +26,7 @@ const resultBox = document.getElementById('resultBox');
 const loader = document.getElementById('loader');
 const historyList = document.getElementById('historyList');
 
-// Monitor de Autenticação
+// Monitor de Login
 onAuthStateChanged(auth, (user) => {
     if (user) {
         document.body.className = 'auth-true';
@@ -37,7 +40,7 @@ onAuthStateChanged(auth, (user) => {
 btnGoogle.onclick = () => signInWithPopup(auth, provider);
 btnLogout.onclick = () => signOut(auth);
 
-// Lógica de Geração via API (Vercel Serverless)
+// Gerar Prompt
 btnGenerate.onclick = async () => {
     const text = promptInput.value.trim();
     if (!text) return;
@@ -52,17 +55,12 @@ btnGenerate.onclick = async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userInput: text })
         });
-        
         const data = await response.json();
-        if (data.prompt) {
-            outputText.innerText = data.prompt;
-            resultBox.classList.remove('hidden');
-            addToHistory(text);
-        } else {
-            throw new Error();
-        }
+        outputText.innerText = data.prompt;
+        resultBox.classList.remove('hidden');
+        addToHistory(text);
     } catch (e) {
-        alert("Erro ao conectar com a IA. Verifique se o deploy na Vercel está correto.");
+        alert("Erro na conexão.");
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
@@ -78,7 +76,12 @@ function addToHistory(text) {
 
 document.getElementById('btnCopy').onclick = () => {
     navigator.clipboard.writeText(outputText.innerText);
-    alert("Copiado para a área de transferência!");
+    alert("Copiado!");
+};
+
+document.getElementById('btnNew').onclick = () => {
+    promptInput.value = '';
+    resultBox.classList.add('hidden');
 };
 
 lucide.createIcons();
