@@ -35,7 +35,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 btnGoogle.onclick = async () => {
-    try { await signInWithPopup(auth, provider); } catch (e) { alert(e.message); }
+    try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }
 };
 
 btnLogout.onclick = () => signOut(auth);
@@ -55,21 +55,20 @@ btnGenerate.onclick = async () => {
             body: JSON.stringify({ userInput: text })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorHtml = await response.text();
-            console.error("Servidor retornou erro:", errorHtml);
-            throw new Error("A API não foi encontrada (404) ou houve erro no servidor.");
+            throw new Error(data.error || `Erro ${response.status}`);
         }
 
-        const data = await response.json();
         if (data.prompt) {
             outputText.innerText = data.prompt;
             resultBox.classList.remove('hidden');
             addToHistory(text);
         }
     } catch (e) {
-        console.error(e);
-        alert("Erro: " + e.message + "\nVerifique se a pasta 'api' está na raiz do projeto.");
+        console.error("Erro na requisição:", e);
+        alert("Erro no pront.ai: " + e.message);
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
