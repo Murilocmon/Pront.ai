@@ -3,67 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pront.ai | Engenharia de Prompt Profissional</title>
+    <title>pront.ai | Professional Prompt Engineering</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="logged-out">
+<body class="auth-false">
 
-    <div id="loginOverlay" class="auth-overlay">
-        <div class="auth-card">
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
             <div class="logo">pront<span>.ai</span></div>
-            <h2>Sua mente, potencializada.</h2>
-            <p>Entre para gerar prompts profissionais ilimitados.</p>
-            <button id="btnGoogleLogin" class="google-btn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg">
+            <h1>Engenharia de Prompt Profissional</h1>
+            <p>Acesse com sua conta Google para gerar prompts magistrais.</p>
+            <button id="btnGoogle" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="G">
                 Entrar com Google
             </button>
         </div>
     </div>
 
-    <div class="app-container">
+    <div class="app-layout">
         <aside class="sidebar">
-            <div class="sidebar-header">
+            <div class="side-header">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" title="Novo Prompt"><i data-lucide="plus"></i></button>
+                <button id="btnNew" class="add-btn" title="Limpar conversa"><i data-lucide="plus"></i></button>
             </div>
-            <div id="history" class="history-list"></div>
-            <div class="user-footer">
-                <img id="userImg" src="" alt="">
-                <div class="u-info">
-                    <span id="uName">Carregando...</span>
-                    <button id="btnLogout">Sair</button>
+            
+            <div class="history-section">
+                <span class="label">HISTÓRICO RECENTE</span>
+                <div id="historyList" class="history-list">
+                    </div>
+            </div>
+
+            <div class="side-footer">
+                <img id="uAvatar" src="https://via.placeholder.com/40" alt="User">
+                <div class="u-meta">
+                    <span id="uName">Usuário</span>
+                    <button id="btnLogout">Sair da conta</button>
                 </div>
             </div>
         </aside>
 
-        <main class="content">
-            <div class="hero">
-                <h1>Transforme ideias em <span class="blue">instruções de elite.</span></h1>
-            </div>
+        <main class="main-content">
+            <header class="app-header">
+                <h2>Transforme sua ideia em <span class="accent">excelência.</span></h2>
+            </header>
 
-            <div class="input-area">
-                <div class="textarea-wrapper">
-                    <textarea id="promptInput" placeholder="O que você quer criar hoje?"></textarea>
-                    <button id="btnGenerate">
-                        <i data-lucide="sparkles"></i>
-                    </button>
+            <div class="workspace">
+                <div class="input-card">
+                    <textarea id="promptInput" placeholder="O que você deseja que a IA faça? Descreva aqui..."></textarea>
+                    <div class="card-actions">
+                        <button id="btnGenerate">
+                            <span>Gerar Prompt Master</span>
+                            <i data-lucide="zap"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div id="loading" class="loading hidden">
-                <div class="dot-typing"></div>
-                <p>Nossa IA está arquitetando seu prompt...</p>
-            </div>
-
-            <div id="resultBox" class="result-card hidden">
-                <div class="card-header">
-                    <span>PROMPT GERADO</span>
-                    <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
+                <div id="loader" class="loader hidden">
+                    <div class="spinner"></div>
+                    <p>Nossa IA está arquitetando o melhor comando...</p>
                 </div>
-                <div class="card-body">
-                    <pre id="outputText"></pre>
+
+                <div id="resultBox" class="result-box hidden">
+                    <div class="res-header">
+                        <span>PROMPT DE ALTA PERFORMANCE</span>
+                        <button id="btnCopy"><i data-lucide="copy"></i> Copiar Prompt</button>
+                    </div>
+                    <div class="res-content">
+                        <pre id="outputText"></pre>
+                    </div>
                 </div>
             </div>
         </main>
