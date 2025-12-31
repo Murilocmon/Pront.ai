@@ -1,13 +1,13 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).end();
+    if (req.method !== 'POST') return res.status(405).json({ message: 'Use POST' });
 
     const { userInput } = req.body;
-    const GROQ_KEY = process.env.GROQ_API_KEY;
+    const GROQ_KEY = process.env.GROQ_API_KEY; // Configure na Vercel!
 
-    const sysPrompt = `Você é um Engenheiro de Prompts Sênior. 
-    Transforme a entrada do usuário em um prompt profissional estruturado.
-    Use os blocos: [PERSONA], [CONTEXTO], [TAREFA], [RESTRIÇÕES].
-    Responda apenas com o prompt gerado.`;
+    const systemMsg = `Você é um Engenheiro de Prompt Sênior. 
+    Transforme a entrada do usuário em um prompt profissional de alta performance. 
+    Use a estrutura: [PERSONA], [CONTEXTO], [TAREFA], [RESTRIÇÕES]. 
+    Responda apenas o prompt gerado.`;
 
     try {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -19,15 +19,14 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 model: "llama-3.1-70b-versatile",
                 messages: [
-                    { role: "system", content: sysPrompt },
+                    { role: "system", content: systemMsg },
                     { role: "user", content: userInput }
                 ]
             })
         });
-
         const data = await response.json();
         res.status(200).json({ prompt: data.choices[0].message.content });
     } catch (error) {
-        res.status(500).json({ error: "Erro na API da Groq" });
+        res.status(500).json({ error: "Erro na IA" });
     }
 }
