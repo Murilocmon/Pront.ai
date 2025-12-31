@@ -35,11 +35,8 @@ onAuthStateChanged(auth, (user) => {
 });
 
 btnGoogle.onclick = async () => {
-    try {
-        await signInWithPopup(auth, provider);
-    } catch (error) {
-        alert("Erro no login: " + error.message);
-    }
+    try { await signInWithPopup(auth, provider); } 
+    catch (error) { console.error(error); }
 };
 
 btnLogout.onclick = () => signOut(auth);
@@ -53,23 +50,29 @@ btnGenerate.onclick = async () => {
     btnGenerate.disabled = true;
 
     try {
-        // Agora chamamos a rota /api/generate que a Vercel cria automaticamente
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userInput: text })
         });
+
+        // Se a resposta não for OK (200), pegamos o texto do erro
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Erro do Servidor:", errorText);
+            throw new Error(`Erro ${response.status}: O servidor não respondeu como esperado.`);
+        }
+
         const data = await response.json();
         
         if (data.prompt) {
             outputText.innerText = data.prompt;
             resultBox.classList.remove('hidden');
             addToHistory(text);
-        } else {
-            throw new Error(data.error || "Erro desconhecido");
         }
     } catch (e) {
-        alert("Erro na conexão com a IA: " + e.message);
+        console.error("Erro na requisição:", e);
+        alert("Erro na conexão com a IA. Detalhes no console (F12).");
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
