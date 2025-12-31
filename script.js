@@ -35,8 +35,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 btnGoogle.onclick = async () => {
-    try { await signInWithPopup(auth, provider); } 
-    catch (error) { console.error(error); }
+    try { await signInWithPopup(auth, provider); } catch (e) { alert(e.message); }
 };
 
 btnLogout.onclick = () => signOut(auth);
@@ -56,23 +55,21 @@ btnGenerate.onclick = async () => {
             body: JSON.stringify({ userInput: text })
         });
 
-        // Se a resposta não for OK (200), pegamos o texto do erro
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Erro do Servidor:", errorText);
-            throw new Error(`Erro ${response.status}: O servidor não respondeu como esperado.`);
+            const errorHtml = await response.text();
+            console.error("Servidor retornou erro:", errorHtml);
+            throw new Error("A API não foi encontrada (404) ou houve erro no servidor.");
         }
 
         const data = await response.json();
-        
         if (data.prompt) {
             outputText.innerText = data.prompt;
             resultBox.classList.remove('hidden');
             addToHistory(text);
         }
     } catch (e) {
-        console.error("Erro na requisição:", e);
-        alert("Erro na conexão com a IA. Detalhes no console (F12).");
+        console.error(e);
+        alert("Erro: " + e.message + "\nVerifique se a pasta 'api' está na raiz do projeto.");
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
