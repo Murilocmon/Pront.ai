@@ -15,6 +15,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// DOM
 const btnGoogle = document.getElementById('btnGoogle');
 const btnLogout = document.getElementById('btnLogout');
 const btnGenerate = document.getElementById('btnGenerate');
@@ -26,11 +27,11 @@ const historyList = document.getElementById('historyList');
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.body.className = 'auth-true';
+        document.body.classList.replace('auth-false', 'auth-true');
         document.getElementById('uName').innerText = user.displayName;
         document.getElementById('uAvatar').src = user.photoURL;
     } else {
-        document.body.className = 'auth-false';
+        document.body.classList.replace('auth-true', 'auth-false');
     }
 });
 
@@ -44,6 +45,7 @@ btnGenerate.onclick = async () => {
     const text = promptInput.value.trim();
     if (!text) return;
 
+    // UI State
     loader.classList.remove('hidden');
     resultBox.classList.add('hidden');
     btnGenerate.disabled = true;
@@ -57,17 +59,17 @@ btnGenerate.onclick = async () => {
 
         const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.error || `Erro ${response.status}`);
-        }
+        if (!response.ok) throw new Error(data.error || `Erro ${response.status}`);
 
         if (data.prompt) {
             outputText.innerText = data.prompt;
             resultBox.classList.remove('hidden');
             addToHistory(text);
+            
+            // Auto-scroll suave para o resultado
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     } catch (e) {
-        console.error("Erro na requisição:", e);
         alert("Erro no pront.ai: " + e.message);
     } finally {
         loader.classList.add('hidden');
@@ -79,17 +81,26 @@ function addToHistory(text) {
     const item = document.createElement('div');
     item.className = 'history-item';
     item.innerText = text;
+    item.onclick = () => { promptInput.value = text; }; // Funcionalidade extra: recupera histórico
     historyList.prepend(item);
 }
 
 document.getElementById('btnCopy').onclick = () => {
     navigator.clipboard.writeText(outputText.innerText);
-    alert("Copiado!");
+    const btn = document.getElementById('btnCopy');
+    const original = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="check"></i> <span>Copiado!</span>`;
+    lucide.createIcons();
+    setTimeout(() => { 
+        btn.innerHTML = original; 
+        lucide.createIcons(); 
+    }, 2000);
 };
 
 document.getElementById('btnNew').onclick = () => {
     promptInput.value = '';
     resultBox.classList.add('hidden');
+    promptInput.focus();
 };
 
 lucide.createIcons();
