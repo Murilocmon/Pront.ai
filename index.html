@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pront.ai | Professional Prompt Engineering</title>
+    <title>pront.ai | Engenharia de Prompt Profissional</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,32 +13,29 @@
     <div id="loginOverlay" class="login-overlay">
         <div class="login-card">
             <div class="logo">pront<span>.ai</span></div>
-            <h1>Engenharia de Prompt Profissional</h1>
-            <p>Acesse com sua conta Google para gerar prompts magistrais.</p>
+            <h1>Sua inteligência, lapidada.</h1>
+            <p>Acesse com sua conta Google para começar.</p>
             <button id="btnGoogle" class="google-btn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="G">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
                 Entrar com Google
             </button>
         </div>
     </div>
 
-    <div class="app-layout">
+    <div class="app-shell">
         <aside class="sidebar">
             <div class="side-header">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" class="add-btn" title="Limpar conversa"><i data-lucide="plus"></i></button>
+                <button id="btnNew" class="icon-btn" title="Novo Prompt"><i data-lucide="plus"></i></button>
             </div>
-            
             <div class="history-section">
-                <span class="label">HISTÓRICO RECENTE</span>
-                <div id="historyList" class="history-list">
-                    </div>
+                <span class="label">HISTÓRICO</span>
+                <div id="historyList" class="history-list"></div>
             </div>
-
             <div class="side-footer">
-                <img id="uAvatar" src="https://via.placeholder.com/40" alt="User">
+                <img id="uAvatar" src="" alt="">
                 <div class="u-meta">
-                    <span id="uName">Usuário</span>
+                    <span id="uName">Carregando...</span>
                     <button id="btnLogout">Sair da conta</button>
                 </div>
             </div>
@@ -46,15 +43,15 @@
 
         <main class="main-content">
             <header class="app-header">
-                <h2>Transforme sua ideia em <span class="accent">excelência.</span></h2>
+                <h2>O que vamos <span class="blue">arquitetar</span> hoje?</h2>
             </header>
 
             <div class="workspace">
                 <div class="input-card">
-                    <textarea id="promptInput" placeholder="O que você deseja que a IA faça? Descreva aqui..."></textarea>
-                    <div class="card-actions">
+                    <textarea id="promptInput" placeholder="Descreva sua ideia de forma simples..."></textarea>
+                    <div class="card-footer">
                         <button id="btnGenerate">
-                            <span>Gerar Prompt Master</span>
+                            <span>Gerar Prompt Profissional</span>
                             <i data-lucide="zap"></i>
                         </button>
                     </div>
@@ -62,13 +59,13 @@
 
                 <div id="loader" class="loader hidden">
                     <div class="spinner"></div>
-                    <p>Nossa IA está arquitetando o melhor comando...</p>
+                    <p>Nossa IA está projetando a estrutura ideal...</p>
                 </div>
 
                 <div id="resultBox" class="result-box hidden">
                     <div class="res-header">
                         <span>PROMPT DE ALTA PERFORMANCE</span>
-                        <button id="btnCopy"><i data-lucide="copy"></i> Copiar Prompt</button>
+                        <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
                     </div>
                     <div class="res-content">
                         <pre id="outputText"></pre>
