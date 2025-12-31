@@ -1,47 +1,51 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Substitua pelos seus dados do Firebase Console
+// Seus dados reais inseridos aqui
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "seu-projeto.firebaseapp.com",
-    projectId: "seu-projeto",
-    appId: "ID"
+  apiKey: "AIzaSyD3UMwRrFBB9WqHZ4pvghwFNn4rw2kVv50",
+  authDomain: "pront-ai.firebaseapp.com",
+  projectId: "pront-ai",
+  storageBucket: "pront-ai.firebasestorage.app",
+  messagingSenderId: "356777790012",
+  appId: "1:356777790012:web:53d4e536bb38d742f09139",
+  measurementId: "G-BZK224C6L5"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// DOM
-const btnLogin = document.getElementById('btnGoogleLogin');
+// Elementos DOM
+const btnGoogle = document.getElementById('btnGoogle');
 const btnLogout = document.getElementById('btnLogout');
 const btnGenerate = document.getElementById('btnGenerate');
 const promptInput = document.getElementById('promptInput');
 const outputText = document.getElementById('outputText');
 const resultBox = document.getElementById('resultBox');
-const loading = document.getElementById('loading');
+const loader = document.getElementById('loader');
+const historyList = document.getElementById('historyList');
 
-// Auth logic
-btnLogin.onclick = () => signInWithPopup(auth, provider);
-btnLogout.onclick = () => signOut(auth);
-
+// Monitor de Login
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.body.className = 'logged-in';
+        document.body.className = 'auth-true';
         document.getElementById('uName').innerText = user.displayName;
-        document.getElementById('userImg').src = user.photoURL;
+        document.getElementById('uAvatar').src = user.photoURL;
     } else {
-        document.body.className = 'logged-out';
+        document.body.className = 'auth-false';
     }
 });
 
-// Chamar API da Vercel
+btnGoogle.onclick = () => signInWithPopup(auth, provider);
+btnLogout.onclick = () => signOut(auth);
+
+// Gerar Prompt
 btnGenerate.onclick = async () => {
     const text = promptInput.value.trim();
     if (!text) return;
 
-    loading.classList.remove('hidden');
+    loader.classList.remove('hidden');
     resultBox.classList.add('hidden');
     btnGenerate.disabled = true;
 
@@ -52,23 +56,32 @@ btnGenerate.onclick = async () => {
             body: JSON.stringify({ userInput: text })
         });
         const data = await response.json();
-        outputText.innerText = data.text;
+        outputText.innerText = data.prompt;
         resultBox.classList.remove('hidden');
-        saveToHistory(text);
+        addToHistory(text);
     } catch (e) {
-        alert("Erro ao conectar com o servidor.");
+        alert("Erro na conexão.");
     } finally {
-        loading.classList.add('hidden');
+        loader.classList.add('hidden');
         btnGenerate.disabled = false;
     }
 };
 
-function saveToHistory(text) {
-    const history = document.getElementById('history');
+function addToHistory(text) {
     const item = document.createElement('div');
     item.className = 'history-item';
     item.innerText = text;
-    history.prepend(item);
+    historyList.prepend(item);
 }
+
+document.getElementById('btnCopy').onclick = () => {
+    navigator.clipboard.writeText(outputText.innerText);
+    alert("Copiado!");
+};
+
+document.getElementById('btnNew').onclick = () => {
+    promptInput.value = '';
+    resultBox.classList.add('hidden');
+};
 
 lucide.createIcons();
