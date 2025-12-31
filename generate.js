@@ -1,32 +1,33 @@
-// Dependência: @google/generative-ai
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+    if (req.method !== 'POST') return res.status(405).end();
 
-  const { userInput } = req.body;
-  const API_KEY = process.env.GEMINI_API_KEY; // Você configurará isso no painel da Vercel
+    const { userInput } = req.body;
+    const GROQ_KEY = process.env.GROQ_API_KEY;
 
-  try {
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const sysPrompt = `Você é um Engenheiro de Prompts Sênior. 
+    Transforme a entrada do usuário em um prompt profissional estruturado.
+    Use os blocos: [PERSONA], [CONTEXTO], [TAREFA], [RESTRIÇÕES].
+    Responda apenas com o prompt gerado.`;
 
-    const systemPrompt = `
-      Você é um Engenheiro de Prompts Sênior. 
-      Sua missão é transformar a entrada do usuário em um prompt profissional e estruturado.
-      Siga o formato:
-      [PERSONA]: Defina o especialista ideal.
-      [CONTEXTO]: Explique o cenário.
-      [TAREFA]: Instrução detalhada.
-      [RESTRIÇÕES]: O que evitar e tom de voz.
-      Responda APENAS o prompt gerado.
-    `;
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROQ_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-70b-versatile",
+                messages: [
+                    { role: "system", content: sysPrompt },
+                    { role: "user", content: userInput }
+                ]
+            })
+        });
 
-    const result = await model.generateContent(`${systemPrompt}\n\nEntrada: ${userInput}`);
-    const response = await result.response;
-    
-    return res.status(200).json({ text: response.text() });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+        const data = await response.json();
+        res.status(200).json({ prompt: data.choices[0].message.content });
+    } catch (error) {
+        res.status(500).json({ error: "Erro na API da Groq" });
+    }
 }
