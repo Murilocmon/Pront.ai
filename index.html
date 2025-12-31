@@ -13,8 +13,8 @@
     <div id="loginOverlay" class="login-overlay">
         <div class="login-card">
             <div class="logo">pront<span>.ai</span></div>
-            <h1>Sua inteligência, lapidada.</h1>
-            <p>Acesse com sua conta Google para começar.</p>
+            <h1>Sua mente, potencializada.</h1>
+            <p>Acesse com o Google para gerar prompts profissionais.</p>
             <button id="btnGoogle" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
                 Entrar com Google
@@ -22,13 +22,13 @@
         </div>
     </div>
 
-    <div class="app-shell">
+    <div class="app-layout">
         <aside class="sidebar">
             <div class="side-header">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" class="icon-btn" title="Novo Prompt"><i data-lucide="plus"></i></button>
+                <button id="btnNew" class="icon-btn" title="Limpar"><i data-lucide="plus"></i></button>
             </div>
-            <div class="history-section">
+            <div class="history-area">
                 <span class="label">HISTÓRICO</span>
                 <div id="historyList" class="history-list"></div>
             </div>
@@ -43,15 +43,15 @@
 
         <main class="main-content">
             <header class="app-header">
-                <h2>O que vamos <span class="blue">arquitetar</span> hoje?</h2>
+                <h2>O que vamos <span class="accent">arquitetar</span> hoje?</h2>
             </header>
 
             <div class="workspace">
                 <div class="input-card">
-                    <textarea id="promptInput" placeholder="Descreva sua ideia de forma simples..."></textarea>
+                    <textarea id="promptInput" placeholder="Descreva sua ideia simples aqui..."></textarea>
                     <div class="card-footer">
                         <button id="btnGenerate">
-                            <span>Gerar Prompt Master</span>
+                            <span>Gerar Prompt Profissional</span>
                             <i data-lucide="zap"></i>
                         </button>
                     </div>
@@ -64,7 +64,7 @@
 
                 <div id="resultBox" class="result-box hidden">
                     <div class="res-header">
-                        <span>PROMPT DE ALTA PERFORMANCE</span>
+                        <span>PROMPT MASTER GERADO</span>
                         <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
                     </div>
                     <div class="res-content">
