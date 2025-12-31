@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pront.ai | Engenharia de Prompt Profissional</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="logged-out">
+
+    <div id="loginOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="logo">pront<span>.ai</span></div>
+            <h2>Sua mente, potencializada.</h2>
+            <p>Entre para gerar prompts profissionais ilimitados.</p>
+            <button id="btnGoogleLogin" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg">
+                Entrar com Google
+            </button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">pront<span>.ai</span></div>
+                <button id="btnNew" title="Novo Prompt"><i data-lucide="plus"></i></button>
+            </div>
+            <div id="history" class="history-list"></div>
+            <div class="user-footer">
+                <img id="userImg" src="" alt="">
+                <div class="u-info">
+                    <span id="uName">Carregando...</span>
+                    <button id="btnLogout">Sair</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="hero">
+                <h1>Transforme ideias em <span class="blue">instruções de elite.</span></h1>
+            </div>
+
+            <div class="input-area">
+                <div class="textarea-wrapper">
+                    <textarea id="promptInput" placeholder="O que você quer criar hoje?"></textarea>
+                    <button id="btnGenerate">
+                        <i data-lucide="sparkles"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading hidden">
+                <div class="dot-typing"></div>
+                <p>Nossa IA está arquitetando seu prompt...</p>
+            </div>
+
+            <div id="resultBox" class="result-card hidden">
+                <div class="card-header">
+                    <span>PROMPT GERADO</span>
+                    <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
+                </div>
+                <div class="card-body">
+                    <pre id="outputText"></pre>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
