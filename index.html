@@ -3,73 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pront.ai | Engenharia de Prompt Profissional</title>
+    <title>pront.ai | Engenharia de Prompt Magistral</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="auth-false">
 
     <div id="loginOverlay" class="login-overlay">
+        <div class="login-background"></div>
         <div class="login-card">
-            <div class="logo">pront<span>.ai</span></div>
-            <h1>Sua mente, potencializada.</h1>
-            <p>Acesse com o Google para gerar prompts profissionais.</p>
+            <div class="logo-large">pront<span>.ai</span></div>
+            <h1>Arquitetura de Prompts Profissionais</h1>
+            <p>Eleve o nível das suas interações com IA através de engenharia avançada.</p>
             <button id="btnGoogle" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
                 Entrar com Google
             </button>
+            <footer class="login-footer">Protegido por criptografia e IA de ponta.</footer>
         </div>
     </div>
 
-    <div class="app-layout">
+    <div class="app-shell">
         <aside class="sidebar">
-            <div class="side-header">
+            <div class="sidebar-top">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" class="icon-btn" title="Limpar"><i data-lucide="plus"></i></button>
+                <button id="btnNew" class="btn-new-chat" title="Novo Prompt">
+                    <i data-lucide="plus-circle"></i>
+                    <span>Nova Ideia</span>
+                </button>
             </div>
-            <div class="history-area">
-                <span class="label">HISTÓRICO</span>
-                <div id="historyList" class="history-list"></div>
+            
+            <div class="history-container">
+                <span class="sidebar-label">RECENTES</span>
+                <div id="historyList" class="history-list">
+                    </div>
             </div>
-            <div class="side-footer">
-                <img id="uAvatar" src="" alt="">
-                <div class="u-meta">
-                    <span id="uName">Carregando...</span>
-                    <button id="btnLogout">Sair da conta</button>
+
+            <div class="user-profile-card">
+                <div class="profile-info">
+                    <img id="uAvatar" src="" alt="User">
+                    <div class="profile-text">
+                        <span id="uName">Carregando...</span>
+                        <p>Plano Pro</p>
+                    </div>
                 </div>
+                <button id="btnLogout" title="Sair"><i data-lucide="log-out"></i></button>
             </div>
         </aside>
 
         <main class="main-content">
-            <header class="app-header">
-                <h2>O que vamos <span class="accent">arquitetar</span> hoje?</h2>
-            </header>
+            <div class="content-wrapper">
+                <header class="main-header">
+                    <h1>O que vamos <span class="gradient-text">arquitetar</span> hoje?</h1>
+                    <p>Descreva seu objetivo e nossa IA criará o prompt perfeito.</p>
+                </header>
 
-            <div class="workspace">
-                <div class="input-card">
-                    <textarea id="promptInput" placeholder="Descreva sua ideia simples aqui..."></textarea>
-                    <div class="card-footer">
-                        <button id="btnGenerate">
-                            <span>Gerar Prompt Profissional</span>
-                            <i data-lucide="zap"></i>
-                        </button>
+                <div class="workspace">
+                    <div class="input-glass-card">
+                        <textarea id="promptInput" placeholder="Ex: Crie uma estratégia de marketing para um brechó de luxo focado no Instagram..."></textarea>
+                        <div class="input-footer">
+                            <span class="char-count">IA Llama 3.3 Ativa</span>
+                            <button id="btnGenerate" class="primary-button">
+                                <span>Gerar Prompt</span>
+                                <i data-lucide="sparkles"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div id="loader" class="loader hidden">
-                    <div class="spinner"></div>
-                    <p>Nossa IA está projetando a estrutura ideal...</p>
-                </div>
+                    <div id="loader" class="loader-container hidden">
+                        <div class="ai-orbit">
+                            <div class="inner-orbit"></div>
+                        </div>
+                        <p>Refinando algoritmos e estruturando contexto...</p>
+                    </div>
 
-                <div id="resultBox" class="result-box hidden">
-                    <div class="res-header">
-                        <span>PROMPT MASTER GERADO</span>
-                        <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
-                    </div>
-                    <div class="res-content">
-                        <pre id="outputText"></pre>
-                    </div>
+                    <section id="resultBox" class="result-container hidden">
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="badge">PROMPT ESTRUTURADO</div>
+                                <button id="btnCopy" class="btn-action">
+                                    <i data-lucide="copy"></i>
+                                    <span>Copiar</span>
+                                </button>
+                            </div>
+                            <div class="result-content">
+                                <pre id="outputText"></pre>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </main>
