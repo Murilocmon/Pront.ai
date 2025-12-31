@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Seus dados reais inseridos aqui
+// Suas credenciais oficiais
 const firebaseConfig = {
   apiKey: "AIzaSyD3UMwRrFBB9WqHZ4pvghwFNn4rw2kVv50",
   authDomain: "pront-ai.firebaseapp.com",
@@ -12,11 +12,12 @@ const firebaseConfig = {
   measurementId: "G-BZK224C6L5"
 };
 
+// Inicialização
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Elementos DOM
+// Elementos do DOM
 const btnGoogle = document.getElementById('btnGoogle');
 const btnLogout = document.getElementById('btnLogout');
 const btnGenerate = document.getElementById('btnGenerate');
@@ -26,21 +27,39 @@ const resultBox = document.getElementById('resultBox');
 const loader = document.getElementById('loader');
 const historyList = document.getElementById('historyList');
 
-// Monitor de Login
+// --- LÓGICA DE LOGIN ---
+
+btnGoogle.onclick = async () => {
+    console.log("Tentando logar...");
+    try {
+        await signInWithPopup(auth, provider);
+        console.log("Login realizado com sucesso!");
+    } catch (error) {
+        console.error("Erro detalhado do Firebase:", error);
+        // Este alerta vai te dizer o que falta configurar
+        alert("Erro no Login: " + error.message); 
+    }
+};
+
+btnLogout.onclick = () => signOut(auth);
+
+// Observador de estado (Verifica se está logado)
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.body.className = 'auth-true';
+        console.log("Usuário logado:", user.displayName);
+        document.body.classList.remove('auth-false');
+        document.body.classList.add('auth-true');
         document.getElementById('uName').innerText = user.displayName;
         document.getElementById('uAvatar').src = user.photoURL;
     } else {
-        document.body.className = 'auth-false';
+        console.log("Nenhum usuário logado.");
+        document.body.classList.remove('auth-true');
+        document.body.classList.add('auth-false');
     }
 });
 
-btnGoogle.onclick = () => signInWithPopup(auth, provider);
-btnLogout.onclick = () => signOut(auth);
+// --- LÓGICA DA IA ---
 
-// Gerar Prompt
 btnGenerate.onclick = async () => {
     const text = promptInput.value.trim();
     if (!text) return;
@@ -55,12 +74,18 @@ btnGenerate.onclick = async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userInput: text })
         });
+        
         const data = await response.json();
-        outputText.innerText = data.prompt;
-        resultBox.classList.remove('hidden');
-        addToHistory(text);
+        
+        if (data.prompt) {
+            outputText.innerText = data.prompt;
+            resultBox.classList.remove('hidden');
+            addToHistory(text);
+        } else {
+            throw new Error("Resposta da IA vazia");
+        }
     } catch (e) {
-        alert("Erro na conexão.");
+        alert("Erro ao conectar com a IA. Verifique se a GROQ_API_KEY está configurada na Vercel.");
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
@@ -74,9 +99,12 @@ function addToHistory(text) {
     historyList.prepend(item);
 }
 
+// Funções de UI
 document.getElementById('btnCopy').onclick = () => {
     navigator.clipboard.writeText(outputText.innerText);
-    alert("Copiado!");
+    const originalText = document.getElementById('btnCopy').innerHTML;
+    document.getElementById('btnCopy').innerText = "Copiado!";
+    setTimeout(() => { document.getElementById('btnCopy').innerHTML = originalText; }, 2000);
 };
 
 document.getElementById('btnNew').onclick = () => {
@@ -84,4 +112,5 @@ document.getElementById('btnNew').onclick = () => {
     resultBox.classList.add('hidden');
 };
 
+// Inicializa os ícones do Lucide
 lucide.createIcons();
