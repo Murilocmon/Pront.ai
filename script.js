@@ -1,8 +1,9 @@
+// CONFIGURAÇÕES SUPABASE
 const SUPABASE_URL = "https://xvkgjlnsavcclfnzblig.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2a2dqbG5zYXZjY2xmbnpibGlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0MDEzMTEsImV4cCI6MjA4Mzk3NzMxMX0.Vp9hVFBratBs-FOPDWh0LIFGN6D8A5AUcbb683oTkwc";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2a2dqbG5zYXZjY2xmbnpibGlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0MDEzMTEsImV4cCI6MjA4Mzk3NzMxMX0.Vp9hVFBratBs-FOPDWh0LIFGN6D8A5AUcbb683oTkwc"; // Certifique-se de usar a 'anon public'
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// DOM Elements
+// ELEMENTOS
 const btnGoogle = document.getElementById('btnGoogle');
 const btnLogout = document.getElementById('btnLogout');
 const btnGenerate = document.getElementById('btnGenerate');
@@ -18,10 +19,11 @@ const upgradeModal = document.getElementById('upgradeModal');
 let userData = null;
 let currentUser = null;
 
-// --- GERENCIAMENTO DE SESSÃO (CORREÇÃO AQUI) ---
+// --- GERENCIAMENTO DE SESSÃO ---
 
 _supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log("Evento de Auth:", event);
+    console.log("Evento Auth:", event);
+    
     if (session) {
         currentUser = session.user;
         document.body.classList.replace('auth-false', 'auth-true');
@@ -40,7 +42,7 @@ btnGoogle.onclick = async () => {
             redirectTo: window.location.origin 
         }
     });
-    if (error) alert("Erro: " + error.message);
+    if (error) alert("Erro de Autenticação: " + error.message);
 };
 
 btnLogout.onclick = async () => {
@@ -51,29 +53,34 @@ btnLogout.onclick = async () => {
 // --- BANCO DE DATOS ---
 
 async function syncUserData() {
-    let { data, error } = await _supabase
-        .from('users')
-        .select('*')
-        .eq('id', currentUser.id)
-        .single();
-
-    if (!data) {
-        const { data: newUser } = await _supabase
+    try {
+        let { data, error } = await _supabase
             .from('users')
-            .insert([{ 
-                id: currentUser.id, 
-                email: currentUser.email, 
-                plan: 'Standart', 
-                usage: 0, 
-                history: [] 
-            }])
-            .select()
+            .select('*')
+            .eq('id', currentUser.id)
             .single();
-        userData = newUser;
-    } else {
-        userData = data;
+
+        if (error && error.code === 'PGRST116') {
+            // Usuário novo: Criar registro
+            const { data: newUser } = await _supabase
+                .from('users')
+                .insert([{ 
+                    id: currentUser.id, 
+                    email: currentUser.email, 
+                    plan: 'Standart', 
+                    usage: 0, 
+                    history: [] 
+                }])
+                .select()
+                .single();
+            userData = newUser;
+        } else {
+            userData = data;
+        }
+        updateUI();
+    } catch (e) {
+        console.error("Erro ao sincronizar dados:", e);
     }
-    updateUI();
 }
 
 function updateUI() {
@@ -82,16 +89,18 @@ function updateUI() {
     usageCountUI.innerText = userData.plan === 'Pro' ? "Usos: Ilimitados" : `Usos: ${userData.usage} / 2`;
     
     historyList.innerHTML = "";
-    userData.history.slice().reverse().forEach(text => {
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerText = text;
-        item.onclick = () => { promptInput.value = text; };
-        historyList.appendChild(item);
-    });
+    if (userData.history) {
+        userData.history.slice().reverse().forEach(text => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerText = text;
+            item.onclick = () => { promptInput.value = text; };
+            historyList.appendChild(item);
+        });
+    }
 }
 
-// --- GERAÇÃO DE PROMPT (Llama 3.3) ---
+// --- GERAÇÃO IA (LLAMA 3.3) ---
 
 btnGenerate.onclick = async () => {
     const text = promptInput.value.trim();
@@ -121,7 +130,7 @@ btnGenerate.onclick = async () => {
             resultBox.classList.remove('hidden');
 
             const newUsage = userData.usage + 1;
-            const newHistory = [...userData.history, text].slice(-10);
+            const newHistory = [...(userData.history || []), text].slice(-10);
 
             const { data: updatedUser } = await _supabase
                 .from('users')
@@ -135,14 +144,14 @@ btnGenerate.onclick = async () => {
             resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     } catch (e) {
-        alert("Erro: " + e.message);
+        alert("Falha: " + e.message);
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
     }
 };
 
-// UI Events
+// UI EVENTS
 document.getElementById('btnCopy').onclick = () => {
     navigator.clipboard.writeText(outputText.innerText);
     alert("Copiado!");
