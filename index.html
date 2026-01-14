@@ -7,20 +7,32 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="auth-false">
 
+    <div id="upgradeModal" class="modal hidden">
+        <div class="modal-content pricing-card">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="badge-promo">PROMOÇÃO DE LANÇAMENTO</div>
+            <h2>Torne-se <span class="blue">PRO</span></h2>
+            <p>Seus usos gratuitos acabaram. Libere o poder ilimitado.</p>
+            <div class="price-box">
+                <span class="old-price">R$ 49,90</span>
+                <span class="current-price">R$ 19,90<small>/mês</small></span>
+            </div>
+            <button class="btn-upgrade-now">Assinar Plano Pro</button>
+        </div>
+    </div>
+
     <div id="loginOverlay" class="login-overlay">
-        <div class="login-background"></div>
         <div class="login-card">
             <div class="logo-large">pront<span>.ai</span></div>
-            <h1>Arquitetura de Prompts Profissionais</h1>
-            <p>Eleve o nível das suas interações com IA através de engenharia avançada.</p>
+            <h1>Engenharia de Prompt Profissional</h1>
             <button id="btnGoogle" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
                 Entrar com Google
             </button>
-            <footer class="login-footer">Protegido por criptografia e IA de ponta.</footer>
         </div>
     </div>
 
@@ -28,27 +40,18 @@
         <aside class="sidebar">
             <div class="sidebar-top">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" class="btn-new-chat" title="Novo Prompt">
-                    <i data-lucide="plus-circle"></i>
-                    <span>Nova Ideia</span>
-                </button>
+                <button id="btnNew" class="btn-new-chat"><i data-lucide="plus-circle"></i> <span>Novo</span></button>
             </div>
-            
             <div class="history-container">
-                <span class="sidebar-label">RECENTES</span>
-                <div id="historyList" class="history-list">
-                    </div>
-            </div>
-
-            <div class="user-profile-card">
-                <div class="profile-info">
-                    <img id="uAvatar" src="" alt="User">
-                    <div class="profile-text">
-                        <span id="uName">Carregando...</span>
-                        <p>Plano Pro</p>
-                    </div>
+                <div class="plan-status-card">
+                    <p id="planName">Plano: <b>Standart</b></p>
+                    <p id="usageCount">Usos: 0 / 2</p>
                 </div>
-                <button id="btnLogout" title="Sair"><i data-lucide="log-out"></i></button>
+                <div id="historyList" class="history-list"></div>
+            </div>
+            <div class="user-profile-card">
+                <span id="uEmail">...</span>
+                <button id="btnLogout"><i data-lucide="log-out"></i></button>
             </div>
         </aside>
 
@@ -56,40 +59,20 @@
             <div class="content-wrapper">
                 <header class="main-header">
                     <h1>O que vamos <span class="gradient-text">arquitetar</span> hoje?</h1>
-                    <p>Descreva seu objetivo e nossa IA criará o prompt perfeito.</p>
                 </header>
-
                 <div class="workspace">
                     <div class="input-glass-card">
-                        <textarea id="promptInput" placeholder="Ex: Crie uma estratégia de marketing para um brechó de luxo focado no Instagram..."></textarea>
-                        <div class="input-footer">
-                            <span class="char-count">IA Llama 3.3 Ativa</span>
-                            <button id="btnGenerate" class="primary-button">
-                                <span>Gerar Prompt</span>
-                                <i data-lucide="sparkles"></i>
-                            </button>
-                        </div>
+                        <textarea id="promptInput" placeholder="Sua ideia aqui..."></textarea>
+                        <button id="btnGenerate" class="primary-button">Gerar Prompt <i data-lucide="zap"></i></button>
                     </div>
-
-                    <div id="loader" class="loader-container hidden">
-                        <div class="ai-orbit">
-                            <div class="inner-orbit"></div>
-                        </div>
-                        <p>Refinando algoritmos e estruturando contexto...</p>
-                    </div>
-
+                    <div id="loader" class="loader hidden"><div class="spinner"></div></div>
                     <section id="resultBox" class="result-container hidden">
                         <div class="result-card">
                             <div class="result-header">
-                                <div class="badge">PROMPT ESTRUTURADO</div>
-                                <button id="btnCopy" class="btn-action">
-                                    <i data-lucide="copy"></i>
-                                    <span>Copiar</span>
-                                </button>
+                                <span>PROMPT GERADO</span>
+                                <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
                             </div>
-                            <div class="result-content">
-                                <pre id="outputText"></pre>
-                            </div>
+                            <pre id="outputText"></pre>
                         </div>
                     </section>
                 </div>
@@ -97,6 +80,6 @@
         </main>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
