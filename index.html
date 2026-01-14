@@ -16,19 +16,26 @@
             <button class="close-modal" id="closeModal">&times;</button>
             <div class="badge-promo">PROMOÇÃO DE LANÇAMENTO</div>
             <h2>Torne-se <span class="blue">PRO</span></h2>
-            <p>Seus usos gratuitos acabaram. Libere o poder ilimitado.</p>
+            <p>Seus usos gratuitos acabaram. Libere o poder ilimitado da nossa IA.</p>
             <div class="price-box">
                 <span class="old-price">R$ 49,90</span>
                 <span class="current-price">R$ 19,90<small>/mês</small></span>
             </div>
+            <ul class="features">
+                <li><i data-lucide="check"></i> Usos Ilimitados</li>
+                <li><i data-lucide="check"></i> IA Llama 3.3 (Mais rápida)</li>
+                <li><i data-lucide="check"></i> Histórico na Nuvem</li>
+            </ul>
             <button class="btn-upgrade-now">Assinar Plano Pro</button>
         </div>
     </div>
 
     <div id="loginOverlay" class="login-overlay">
+        <div class="login-background"></div>
         <div class="login-card">
             <div class="logo-large">pront<span>.ai</span></div>
-            <h1>Engenharia de Prompt Profissional</h1>
+            <h1>Arquitetura de Prompts Profissionais</h1>
+            <p>Faça login para começar a criar comandos magistrais.</p>
             <button id="btnGoogle" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
                 Entrar com Google
@@ -40,17 +47,30 @@
         <aside class="sidebar">
             <div class="sidebar-top">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" class="btn-new-chat"><i data-lucide="plus-circle"></i> <span>Novo</span></button>
+                <button id="btnNew" class="btn-new-chat">
+                    <i data-lucide="plus-circle"></i>
+                    <span>Nova Ideia</span>
+                </button>
             </div>
+            
             <div class="history-container">
+                <span class="sidebar-label">CONTA E PLANO</span>
                 <div class="plan-status-card">
                     <p id="planName">Plano: <b>Standart</b></p>
                     <p id="usageCount">Usos: 0 / 2</p>
+                    <button id="btnOpenUpgrade" class="btn-mini-upgrade">Upgrade para PRO</button>
                 </div>
+                <span class="sidebar-label" style="margin-top: 20px;">RECENTES</span>
                 <div id="historyList" class="history-list"></div>
             </div>
+
             <div class="user-profile-card">
-                <span id="uEmail">...</span>
+                <div class="profile-info">
+                    <img id="uAvatar" src="" alt="User">
+                    <div class="profile-text">
+                        <span id="uName">Carregando...</span>
+                    </div>
+                </div>
                 <button id="btnLogout"><i data-lucide="log-out"></i></button>
             </div>
         </aside>
@@ -59,20 +79,35 @@
             <div class="content-wrapper">
                 <header class="main-header">
                     <h1>O que vamos <span class="gradient-text">arquitetar</span> hoje?</h1>
+                    <p>IA Llama 3.3 de alta performance pronta para agir.</p>
                 </header>
+
                 <div class="workspace">
                     <div class="input-glass-card">
-                        <textarea id="promptInput" placeholder="Sua ideia aqui..."></textarea>
-                        <button id="btnGenerate" class="primary-button">Gerar Prompt <i data-lucide="zap"></i></button>
+                        <textarea id="promptInput" placeholder="Descreva sua ideia simples aqui..."></textarea>
+                        <div class="input-footer">
+                            <span class="char-count">Sistema Ativo</span>
+                            <button id="btnGenerate" class="primary-button">
+                                <span>Gerar Prompt</span>
+                                <i data-lucide="zap"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div id="loader" class="loader hidden"><div class="spinner"></div></div>
+
+                    <div id="loader" class="loader-container hidden">
+                        <div class="ai-orbit"><div class="inner-orbit"></div></div>
+                        <p>Refinando algoritmos...</p>
+                    </div>
+
                     <section id="resultBox" class="result-container hidden">
                         <div class="result-card">
                             <div class="result-header">
-                                <span>PROMPT GERADO</span>
-                                <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
+                                <div class="badge">PROMPT ESTRUTURADO</div>
+                                <button id="btnCopy" class="btn-action"><i data-lucide="copy"></i> Copiar</button>
                             </div>
-                            <pre id="outputText"></pre>
+                            <div class="result-content">
+                                <pre id="outputText"></pre>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -80,6 +115,6 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
