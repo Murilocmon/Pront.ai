@@ -1,19 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD3UMwRrFBB9WqHZ4pvghwFNn4rw2kVv50",
-  authDomain: "pront-ai.firebaseapp.com",
-  projectId: "pront-ai",
-  storageBucket: "pront-ai.firebasestorage.app",
-  messagingSenderId: "356777790012",
-  appId: "1:356777790012:web:53d4e536bb38d742f09139",
-  measurementId: "G-BZK224C6L5"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+const SUPABASE_URL = "https://xvkgjlnsavcclfnzblig.supabase.co";
+const SUPABASE_KEY = "sb_secret_elQ_8o5ToUjqDFRsIndU3w_GsD3VLjl";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // DOM
 const btnGoogle = document.getElementById('btnGoogle');
@@ -24,83 +11,124 @@ const outputText = document.getElementById('outputText');
 const resultBox = document.getElementById('resultBox');
 const loader = document.getElementById('loader');
 const historyList = document.getElementById('historyList');
+const planNameUI = document.getElementById('planName');
+const usageCountUI = document.getElementById('usageCount');
+const upgradeModal = document.getElementById('upgradeModal');
 
-onAuthStateChanged(auth, (user) => {
+let currentUser = null;
+let userData = null;
+
+// --- AUTH ---
+async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-        document.body.classList.replace('auth-false', 'auth-true');
-        document.getElementById('uName').innerText = user.displayName;
-        document.getElementById('uAvatar').src = user.photoURL;
+        currentUser = user;
+        document.body.className = 'auth-true';
+        document.getElementById('uEmail').innerText = user.email;
+        await fetchUserData();
     } else {
-        document.body.classList.replace('auth-true', 'auth-false');
+        document.body.className = 'auth-false';
     }
-});
+}
 
 btnGoogle.onclick = async () => {
-    try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }
+    await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin }
+    });
 };
 
-btnLogout.onclick = () => signOut(auth);
+btnLogout.onclick = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
+};
 
+// --- DATABASE ---
+async function fetchUserData() {
+    let { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+
+    if (!data) {
+        // Criar registro inicial
+        const { data: newUser } = await supabase.from('users').insert([
+            { id: currentUser.id, email: currentUser.email, usage: 0, plan: 'Standart', history: [] }
+        ]).select().single();
+        userData = newUser;
+    } else {
+        userData = data;
+    }
+    updateUI();
+}
+
+function updateUI() {
+    planNameUI.innerHTML = `Plano: <b class="${userData.plan === 'Pro' ? 'blue' : ''}">${userData.plan}</b>`;
+    usageCountUI.innerText = userData.plan === 'Pro' ? "Usos: Ilimitados" : `Usos: ${userData.usage} / 2`;
+    
+    historyList.innerHTML = "";
+    userData.history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerText = item;
+        div.onclick = () => promptInput.value = item;
+        historyList.prepend(div);
+    });
+}
+
+// --- GERAÇÃO ---
 btnGenerate.onclick = async () => {
-    const text = promptInput.value.trim();
-    if (!text) return;
+    const input = promptInput.value.trim();
+    if (!input) return;
 
-    // UI State
+    if (userData.plan === 'Standart' && userData.usage >= 2) {
+        upgradeModal.classList.remove('hidden');
+        return;
+    }
+
     loader.classList.remove('hidden');
     resultBox.classList.add('hidden');
     btnGenerate.disabled = true;
 
     try {
-        const response = await fetch('/api/generate', {
+        const res = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userInput: text })
+            body: JSON.stringify({ userInput: input })
         });
-
-        const data = await response.json();
-
-        if (!response.ok) throw new Error(data.error || `Erro ${response.status}`);
+        const data = await res.json();
 
         if (data.prompt) {
             outputText.innerText = data.prompt;
             resultBox.classList.remove('hidden');
-            addToHistory(text);
+
+            // Atualizar uso e histórico no Supabase
+            const newHistory = [...userData.history, input].slice(-10); // Mantém 10
+            const { data: updated } = await supabase
+                .from('users')
+                .update({ usage: userData.usage + 1, history: newHistory })
+                .eq('id', currentUser.id)
+                .select()
+                .single();
             
-            // Auto-scroll suave para o resultado
-            resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            userData = updated;
+            updateUI();
         }
     } catch (e) {
-        alert("Erro no pront.ai: " + e.message);
+        alert("Erro na geração.");
     } finally {
         loader.classList.add('hidden');
         btnGenerate.disabled = false;
     }
 };
 
-function addToHistory(text) {
-    const item = document.createElement('div');
-    item.className = 'history-item';
-    item.innerText = text;
-    item.onclick = () => { promptInput.value = text; }; // Funcionalidade extra: recupera histórico
-    historyList.prepend(item);
-}
-
 document.getElementById('btnCopy').onclick = () => {
     navigator.clipboard.writeText(outputText.innerText);
-    const btn = document.getElementById('btnCopy');
-    const original = btn.innerHTML;
-    btn.innerHTML = `<i data-lucide="check"></i> <span>Copiado!</span>`;
-    lucide.createIcons();
-    setTimeout(() => { 
-        btn.innerHTML = original; 
-        lucide.createIcons(); 
-    }, 2000);
+    alert("Copiado!");
 };
 
-document.getElementById('btnNew').onclick = () => {
-    promptInput.value = '';
-    resultBox.classList.add('hidden');
-    promptInput.focus();
-};
+document.getElementById('closeModal').onclick = () => upgradeModal.classList.add('hidden');
 
+checkUser();
 lucide.createIcons();
