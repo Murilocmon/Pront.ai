@@ -6,24 +6,9 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let userData = { plan: 'Standart', usage: 0, history: [] };
 let currentUser = null;
 
-const dom = {
-    btnGenerate: document.getElementById('btnGenerate'),
-    btnLogout: document.getElementById('btnLogout'),
-    btnGoogle: document.getElementById('btnGoogle'),
-    promptInput: document.getElementById('promptInput'),
-    outputText: document.getElementById('outputText'),
-    resultBox: document.getElementById('resultBox'),
-    loader: document.getElementById('loader'),
-    planLabel: document.getElementById('planLabel'),
-    usageLabel: document.getElementById('usageLabel'),
-    progressBar: document.getElementById('progressBar'),
-    historyList: document.getElementById('historyList'),
-    upgradeModal: document.getElementById('upgradeModal'),
-    aiBadge: document.getElementById('aiBadge')
-};
-
-// --- MONITOR DE SESSÃO ---
+// Escutador Central de Login
 _supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log("Evento Auth:", event);
     if (session) {
         currentUser = session.user;
         document.body.className = 'auth-true';
@@ -36,18 +21,13 @@ _supabase.auth.onAuthStateChange(async (event, session) => {
     lucide.createIcons();
 });
 
-// --- SINCRONIZAÇÃO DE DADOS ---
 async function syncData() {
     if (!currentUser) return;
     let { data, error } = await _supabase.from('users').select('*').eq('id', currentUser.id).single();
 
     if (error && error.code === 'PGRST116') {
         const { data: newUser } = await _supabase.from('users').insert([{ 
-            id: currentUser.id, 
-            email: currentUser.email,
-            plan: 'Standart',
-            usage: 0,
-            history: []
+            id: currentUser.id, email: currentUser.email, plan: 'Standart', usage: 0, history: [] 
         }]).select().single();
         userData = newUser;
     } else if (data) {
@@ -57,104 +37,84 @@ async function syncData() {
 }
 
 function updateUI() {
-    if (!userData) return;
     const isPro = userData.plan === 'Pro';
-    dom.planLabel.innerText = userData.plan.toUpperCase();
-    dom.aiBadge.innerText = isPro ? "MODELO: LLAMA 3.3 TURBO" : "MODELO: LLAMA BÁSICO";
+    document.getElementById('planLabel').innerText = userData.plan.toUpperCase();
+    document.getElementById('aiBadge').innerText = isPro ? "MODELO: LLAMA 3.3 TURBO" : "MODELO: LLAMA BÁSICO";
 
     if (isPro) {
-        dom.usageLabel.innerText = "ILIMITADO";
-        dom.progressBar.style.width = "100%";
+        document.getElementById('usageLabel').innerText = "ILIMITADO";
+        document.getElementById('progressBar').style.width = "100%";
         document.getElementById('btnUpgrade').classList.add('hidden');
     } else {
-        dom.usageLabel.innerText = `${userData.usage}/2`;
-        dom.progressBar.style.width = `${(userData.usage / 2) * 100}%`;
+        document.getElementById('usageLabel').innerText = `${userData.usage}/2`;
+        document.getElementById('progressBar').style.width = `${(userData.usage / 2) * 100}%`;
         document.getElementById('btnUpgrade').classList.remove('hidden');
     }
 
-    dom.historyList.innerHTML = (userData.history || []).slice(-5).reverse().map(h => `
-        <div class="history-item" onclick="document.getElementById('promptInput').value='${h}'">${h.substring(0, 30)}...</div>
+    document.getElementById('historyList').innerHTML = (userData.history || []).slice(-5).reverse().map(h => `
+        <div style="padding:10px; font-size:0.8rem; color:#8B949E; cursor:pointer; border-radius:8px;" onclick="document.getElementById('promptInput').value='${h}'">
+            ${h.substring(0, 30)}...
+        </div>
     `).join('');
 }
 
-// --- GERAÇÃO DE PROMPT ---
-dom.btnGenerate.onclick = async () => {
-    const input = dom.promptInput.value.trim();
-    if (!input || dom.btnGenerate.disabled) return;
+// Botões de Ação
+document.getElementById('btnGoogle').onclick = async () => {
+    await _supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+};
+
+document.getElementById('btnLogout').onclick = async () => {
+    await _supabase.auth.signOut();
+    window.location.reload();
+};
+
+document.getElementById('btnGenerate').onclick = async () => {
+    const input = document.getElementById('promptInput').value.trim();
+    if (!input || document.getElementById('btnGenerate').disabled) return;
 
     if (userData.plan === 'Standart' && userData.usage >= 2) {
-        dom.upgradeModal.classList.remove('hidden');
+        document.getElementById('upgradeModal').classList.remove('hidden');
         return;
     }
 
-    dom.loader.classList.remove('hidden');
-    dom.resultBox.classList.add('hidden');
-    dom.btnGenerate.disabled = true;
+    document.getElementById('loader').classList.remove('hidden');
+    document.getElementById('resultBox').classList.add('hidden');
+    document.getElementById('btnGenerate').disabled = true;
 
     try {
         const res = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                userInput: input,
-                plan: userData.plan 
-            })
+            body: JSON.stringify({ userInput: input, plan: userData.plan })
         });
-        
         const data = await res.json();
 
         if (data.prompt) {
-            // MOSTRAR RESULTADO IMEDIATAMENTE
-            dom.outputText.innerText = data.prompt;
-            dom.resultBox.classList.remove('hidden');
-            
-            // ATUALIZAR BANCO EM SEGUIDA
+            document.getElementById('outputText').innerText = data.prompt;
+            document.getElementById('resultBox').classList.remove('hidden');
+
             const newHistory = [...(userData.history || []), input].slice(-10);
-            const { data: updated, error } = await _supabase.from('users')
-                .update({ 
-                    usage: userData.usage + 1, 
-                    history: newHistory 
-                })
-                .eq('id', currentUser.id)
-                .select()
-                .single();
+            const { data: updated } = await _supabase.from('users')
+                .update({ usage: userData.usage + 1, history: newHistory })
+                .eq('id', currentUser.id).select().single();
 
             if (updated) {
                 userData = updated;
                 updateUI();
             }
-        } else {
-            alert("Erro na IA: " + (data.error || "Tente novamente"));
         }
     } catch (e) {
-        console.error("Erro na requisição:", e);
-        alert("Erro de conexão com o servidor.");
+        alert("Erro na conexão.");
     } finally {
-        dom.loader.classList.add('hidden');
-        dom.btnGenerate.disabled = false;
+        document.getElementById('loader').classList.add('hidden');
+        document.getElementById('btnGenerate').disabled = false;
         lucide.createIcons();
     }
 };
 
-// --- FUNÇÕES DE INTERFACE ---
-dom.btnGoogle.onclick = async () => {
-    await _supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
-};
-
-dom.btnLogout.onclick = async () => {
-    await _supabase.auth.signOut();
-    window.location.reload();
-};
-
-document.getElementById('btnUpgrade').onclick = () => dom.upgradeModal.classList.remove('hidden');
-document.getElementById('closeModal').onclick = () => dom.upgradeModal.classList.add('hidden');
+document.getElementById('btnUpgrade').onclick = () => document.getElementById('upgradeModal').classList.remove('hidden');
+document.getElementById('closeModal').onclick = () => document.getElementById('upgradeModal').classList.add('hidden');
 document.getElementById('btnCopy').onclick = () => {
-    navigator.clipboard.writeText(dom.outputText.innerText);
+    navigator.clipboard.writeText(document.getElementById('outputText').innerText);
     alert("Copiado!");
 };
-
-lucide.createIcons();
-    alert("Copiado!");
-};
-
-lucide.createIcons();
