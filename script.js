@@ -18,29 +18,29 @@ const upgradeModal = document.getElementById('upgradeModal');
 let userData = null;
 let currentUser = null;
 
-// --- SISTEMA DE AUTENTICAÇÃO ---
+// --- GERENCIAMENTO DE SESSÃO (CORREÇÃO AQUI) ---
 
-async function checkSession() {
-    const { data: { session } } = await _supabase.auth.getSession();
+_supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log("Evento de Auth:", event);
     if (session) {
         currentUser = session.user;
-        document.body.className = 'auth-true';
+        document.body.classList.replace('auth-false', 'auth-true');
         document.getElementById('uName').innerText = currentUser.user_metadata.full_name || currentUser.email;
         document.getElementById('uAvatar').src = currentUser.user_metadata.avatar_url || "";
         await syncUserData();
     } else {
-        document.body.className = 'auth-false';
+        document.body.classList.replace('auth-true', 'auth-false');
     }
-}
+});
 
 btnGoogle.onclick = async () => {
     const { error } = await _supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin // Redireciona de volta para o seu site
+            redirectTo: window.location.origin 
         }
     });
-    if (error) alert("Erro ao conectar com Google: " + error.message);
+    if (error) alert("Erro: " + error.message);
 };
 
 btnLogout.onclick = async () => {
@@ -48,10 +48,9 @@ btnLogout.onclick = async () => {
     window.location.reload();
 };
 
-// --- BANCO DE DATOS (SUPABASE) ---
+// --- BANCO DE DATOS ---
 
 async function syncUserData() {
-    // Tenta buscar o usuário na tabela personalizada
     let { data, error } = await _supabase
         .from('users')
         .select('*')
@@ -59,8 +58,7 @@ async function syncUserData() {
         .single();
 
     if (!data) {
-        // Se não existe, cria o registro inicial (Standart)
-        const { data: newUser, error: insError } = await _supabase
+        const { data: newUser } = await _supabase
             .from('users')
             .insert([{ 
                 id: currentUser.id, 
@@ -83,7 +81,6 @@ function updateUI() {
     planNameUI.innerHTML = `Plano: <b class="${userData.plan === 'Pro' ? 'blue' : ''}">${userData.plan}</b>`;
     usageCountUI.innerText = userData.plan === 'Pro' ? "Usos: Ilimitados" : `Usos: ${userData.usage} / 2`;
     
-    // Atualiza histórico na sidebar
     historyList.innerHTML = "";
     userData.history.slice().reverse().forEach(text => {
         const item = document.createElement('div');
@@ -94,13 +91,12 @@ function updateUI() {
     });
 }
 
-// --- GERAÇÃO DE PROMPT ---
+// --- GERAÇÃO DE PROMPT (Llama 3.3) ---
 
 btnGenerate.onclick = async () => {
     const text = promptInput.value.trim();
     if (!text) return;
 
-    // Trava de Plano Standart
     if (userData.plan === "Standart" && userData.usage >= 2) {
         upgradeModal.classList.remove('hidden');
         return;
@@ -124,9 +120,8 @@ btnGenerate.onclick = async () => {
             outputText.innerText = data.prompt;
             resultBox.classList.remove('hidden');
 
-            // Salva progresso no Supabase
             const newUsage = userData.usage + 1;
-            const newHistory = [...userData.history, text].slice(-10); // Mantém os últimos 10
+            const newHistory = [...userData.history, text].slice(-10);
 
             const { data: updatedUser } = await _supabase
                 .from('users')
@@ -147,20 +142,16 @@ btnGenerate.onclick = async () => {
     }
 };
 
-// Funções de UI
+// UI Events
 document.getElementById('btnCopy').onclick = () => {
     navigator.clipboard.writeText(outputText.innerText);
     alert("Copiado!");
 };
-
 document.getElementById('btnNew').onclick = () => {
     promptInput.value = '';
     resultBox.classList.add('hidden');
 };
-
 document.getElementById('closeModal').onclick = () => upgradeModal.classList.add('hidden');
 document.getElementById('btnOpenUpgrade').onclick = () => upgradeModal.classList.remove('hidden');
 
-// Iniciar app
-checkSession();
 lucide.createIcons();
