@@ -71,6 +71,18 @@ pre { padding: 2rem; white-space: pre-wrap; line-height: 1.8; color: var(--text-
 
 @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 .badge-promo-animated { background: var(--brand-gradient-gold); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 800; display: inline-block; animation: pulse-gold 2s infinite; }
+/* Garante que o estado inicial não quebre os botões */
+.auth-false .app-shell { display: none !important; }
+.auth-true .login-overlay { display: none !important; }
+
+/* Ajuste de profundidade do modal */
+.modal {
+    z-index: 9999;
+}
+
+.hidden {
+    display: none !important;
+}
 
 .hidden { display: none !important; }
 .loader-container { text-align: center; margin-top: 2rem; }
