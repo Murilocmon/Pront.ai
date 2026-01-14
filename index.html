@@ -1,43 +1,28 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pront.ai | Engenharia de Prompt</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
 <body class="auth-false">
 
     <div id="upgradeModal" class="modal hidden">
         <div class="modal-backdrop"></div>
-        <div class="modal-card">
+        <div class="modal-card pro-highlight">
             <button id="closeModal" class="btn-close">&times;</button>
-            <div class="promo-badge">OFERTA DE LANÇAMENTO</div>
-            <h2>Evolua para o <span class="blue-text">PRO</span></h2>
-            <p>Usos ilimitados e acesso ao modelo Llama 3.3 de ultra velocidade.</p>
-            <div class="price-tag">
-                <span class="old-price">R$ 49,90</span>
-                <span class="new-price">R$ 19,90<small>/mês</small></span>
+            <div class="promo-badge">PROMOÇÃO DE LANÇAMENTO</div>
+            <h2>Nível <span style="color:var(--accent)">ARK-PRO</span></h2>
+            <p style="color:var(--text-dim); margin: 10px 0 25px;">Sua cota Standart expirou. Desbloqueie a potência máxima.</p>
+            
+            <div class="price-tag" style="margin-bottom: 30px;">
+                <span style="text-decoration: line-through; color:var(--text-dim)">R$ 49,90</span>
+                <h1 style="font-size: 3rem;">R$ 19,90<small style="font-size: 1rem;">/mês</small></h1>
             </div>
-            <ul class="benefit-list">
-                <li><i data-lucide="zap"></i> Prompts Ilimitados</li>
-                <li><i data-lucide="database"></i> Histórico em Nuvem</li>
-                <li><i data-lucide="cpu"></i> Prioridade de Processamento</li>
-            </ul>
-            <button class="btn-pay-now">Assinar Agora</button>
+
+            <button class="btn-upgrade-now" style="width:100%; padding:20px; border-radius:15px; background:var(--accent); color:white; border:none; font-weight:800; cursor:pointer;">QUERO ACESSO ILIMITADO</button>
         </div>
     </div>
 
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-box">
+    <div id="loginOverlay" class="login-overlay" style="background:#0B0E14; display:flex; align-items:center; justify-content:center;">
+        <div class="login-box" style="text-align:center; background:var(--surface); padding:4rem; border-radius:30px; border:1px solid var(--border);">
             <div class="logo">pront<span>.ai</span></div>
-            <h1>Bem-vindo ao futuro do Prompt.</h1>
-            <p>Crie arquiteturas de comandos profissionais com IA.</p>
+            <h1 style="margin-bottom:1rem;">Onde a IA vira Engenharia.</h1>
             <button id="btnGoogle" class="btn-google">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" style="width:20px;">
                 Entrar com Google
             </button>
         </div>
@@ -45,59 +30,53 @@
 
     <div class="app-layout">
         <aside class="sidebar">
-            <div class="sidebar-top">
-                <div class="logo">pront<span>.ai</span></div>
-                <div id="planCard" class="plan-card">
-                    <div class="plan-header">
-                        <span id="planLabel">Standart</span>
-                        <span id="usageLabel">0/2</span>
-                    </div>
-                    <div class="progress-bg"><div id="progressBar" class="progress-fill"></div></div>
-                    <button id="btnUpgrade" class="btn-upgrade-sidebar">Upgrade para PRO</button>
+            <div class="logo">pront<span>.ai</span></div>
+            
+            <div id="planCard" class="plan-card">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:800; color:var(--text-dim);">
+                    <span id="planLabel">STANDART</span>
+                    <span id="usageLabel">0/2</span>
                 </div>
+                <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:10px; margin:10px 0;">
+                    <div id="progressBar" style="height:100%; background:var(--primary); width:0%; border-radius:10px; transition:0.5s;"></div>
+                </div>
+                <button id="btnUpgrade" class="btn-upgrade-sidebar">DESBLOQUEAR PRO</button>
             </div>
 
-            <div class="history-section">
-                <label>HISTÓRICO</label>
-                <div id="historyList"></div>
+            <div class="history-section" style="flex:1;">
+                <label style="font-size:0.6rem; font-weight:900; color:var(--text-dim); letter-spacing:1px;">HISTÓRICO</label>
+                <div id="historyList" style="margin-top:1rem;"></div>
             </div>
 
-            <div class="sidebar-user">
-                <div class="user-meta">
-                    <img id="uAvatar" src="">
-                    <span id="uName">...</span>
+            <div class="sidebar-user" style="display:flex; align-items:center; justify-content:space-between; padding-top:1rem; border-top:1px solid var(--border);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img id="uAvatar" src="" style="width:32px; border-radius:50%;">
+                    <span id="uName" style="font-size:0.8rem; font-weight:600;">...</span>
                 </div>
-                <button id="btnLogout" title="Sair"><i data-lucide="log-out"></i></button>
+                <button id="btnLogout" style="background:none; border:none; color:var(--text-dim); cursor:pointer;"><i data-lucide="log-out"></i></button>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="workspace">
                 <header class="hero">
-                    <h1>O que vamos <span class="blue-text">arquitetar</span> hoje?</h1>
+                    <h1>Arquitetura de <span class="gradient-text">Prompts</span></h1>
                 </header>
 
                 <div class="input-container">
                     <textarea id="promptInput" placeholder="Descreva sua ideia simples..."></textarea>
                     <div class="input-bar">
-                        <span class="ai-status">Llama 3.3 Active</span>
-                        <button id="btnGenerate">Gerar Prompt Master <i data-lucide="sparkles"></i></button>
+                        <span style="font-size:0.7rem; color:var(--text-dim); font-weight:700;">MODELO: LLAMA 3.3 TURBO</span>
+                        <button id="btnGenerate">GERAR AGORA <i data-lucide="zap"></i></button>
                     </div>
-                </div>
-
-                <div id="loader" class="loader hidden">
-                    <div class="spinner"></div>
-                    <p>Projetando estrutura de alta performance...</p>
                 </div>
 
                 <div id="resultBox" class="result-area hidden">
                     <div class="result-header">
-                        <span>PROMPT GERADO</span>
-                        <button id="btnCopy"><i data-lucide="copy"></i> Copiar</button>
+                        <span style="font-size:0.6rem; font-weight:900; letter-spacing:1px;">PROMPT ESTRUTURADO</span>
+                        <button id="btnCopy" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:700; cursor:pointer;">COPIAR</button>
                     </div>
-                    <div class="result-body">
-                        <pre id="outputText"></pre>
-                    </div>
+                    <div id="outputText"></div>
                 </div>
             </div>
         </main>
@@ -105,4 +84,3 @@
 
     <script type="module" src="script.js"></script>
 </body>
-</html>
