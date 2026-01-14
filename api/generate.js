@@ -1,14 +1,12 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Método não permitido' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
-    const { userInput } = req.body;
+    const { userInput, plan } = req.body;
     const GROQ_KEY = process.env.GROQ_API_KEY;
 
-    if (!GROQ_KEY) {
-        return res.status(500).json({ error: 'Configuração Incompleta: GROQ_API_KEY não encontrada na Vercel.' });
-    }
+    // Definição de modelos por plano
+    // Standart: Llama 8B (Normal) | Pro: Llama 3.3 70B (Turbo)
+    const modelToUse = plan === "Pro" ? "llama-3.3-70b-versatile" : "llama3-8b-8192";
 
     try {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -18,12 +16,11 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                // MODELO ATUALIZADO PARA LLAMA 3.3
-                model: "llama-3.3-70b-versatile",
+                model: modelToUse,
                 messages: [
                     { 
                         role: "system", 
-                        content: "Você é um Engenheiro de Prompts Sênior. Sua tarefa é transformar a entrada do usuário em um prompt profissional estruturado em blocos: [PERSONA], [CONTEXTO], [TAREFA], [RESTRIÇÕES]. Responda apenas com o prompt gerado em português." 
+                        content: "Você é um Engenheiro de Prompts Sênior. Transforme a ideia do usuário em um prompt estruturado profissional. Responda apenas com o texto do prompt." 
                     },
                     { role: "user", content: userInput }
                 ],
@@ -32,14 +29,13 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-
-        if (!response.ok) {
-            return res.status(response.status).json({ error: data.error?.message || "Erro na Groq" });
+        
+        if (data.choices && data.choices[0]) {
+            return res.status(200).json({ prompt: data.choices[0].message.content });
+        } else {
+            return res.status(500).json({ error: "Erro na resposta da Groq" });
         }
-
-        return res.status(200).json({ prompt: data.choices[0].message.content });
-
     } catch (error) {
-        return res.status(500).json({ error: "Erro interno: " + error.message });
+        return res.status(500).json({ error: error.message });
     }
 }
