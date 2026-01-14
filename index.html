@@ -9,7 +9,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="auth-false"> <div id="upgradeModal" class="modal hidden">
+<body class="auth-false">
+
+    <div id="upgradeModal" class="modal hidden">
         <div class="modal-content pricing-card">
             <button class="close-modal" id="closeModal">&times;</button>
             <div class="badge-promo">PROMOÇÃO DE LANÇAMENTO</div>
@@ -21,7 +23,7 @@
             </div>
             <ul class="features">
                 <li><i data-lucide="check"></i> Usos Ilimitados</li>
-                <li><i data-lucide="check"></i> IA Llama 3.3 (Alta Performance)</li>
+                <li><i data-lucide="check"></i> IA Llama 3.3 (Alta Velocidade)</li>
                 <li><i data-lucide="check"></i> Histórico em Nuvem</li>
             </ul>
             <button class="btn-upgrade-now">Assinar Plano Pro</button>
@@ -29,10 +31,9 @@
     </div>
 
     <div id="loginOverlay" class="login-overlay">
-        <div class="login-background"></div>
         <div class="login-card">
             <div class="logo-large">pront<span>.ai</span></div>
-            <h1>Arquitetura de Prompts Profissionais</h1>
+            <h1>Engenharia de Prompt Profissional</h1>
             <p>Faça login para começar a criar comandos magistrais.</p>
             <button id="btnGoogle" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
@@ -47,7 +48,7 @@
                 <div class="logo">pront<span>.ai</span></div>
                 <button id="btnNew" class="btn-new-chat">
                     <i data-lucide="plus-circle"></i>
-                    <span>Nova Ideia</span>
+                    <span>Novo Prompt</span>
                 </button>
             </div>
             
@@ -84,7 +85,7 @@
                     <div class="input-glass-card">
                         <textarea id="promptInput" placeholder="Descreva sua ideia simples aqui..."></textarea>
                         <div class="input-footer">
-                            <span class="char-count">Sistema Ativo</span>
+                            <span class="char-count">Sistema Inteligente</span>
                             <button id="btnGenerate" class="primary-button">
                                 <span>Gerar Prompt</span>
                                 <i data-lucide="zap"></i>
