@@ -4,8 +4,8 @@ export default async function handler(req, res) {
     const { userInput, plan } = req.body;
     const GROQ_KEY = process.env.GROQ_API_KEY;
 
-    // Definição de modelos por plano
-    // Standart: Llama 8B (Normal) | Pro: Llama 3.3 70B (Turbo)
+    // Diferenciação de modelos por plano
+    // Standart: Llama 8B | Pro: Llama 3.3 70B Turbo
     const modelToUse = plan === "Pro" ? "llama-3.3-70b-versatile" : "llama3-8b-8192";
 
     try {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
                 messages: [
                     { 
                         role: "system", 
-                        content: "Você é um Engenheiro de Prompts Sênior. Transforme a ideia do usuário em um prompt estruturado profissional. Responda apenas com o texto do prompt." 
+                        content: "Você é um Engenheiro de Prompts Sênior. Sua tarefa é transformar a entrada do usuário em um prompt profissional estruturado. Responda APENAS com o texto do prompt gerado." 
                     },
                     { role: "user", content: userInput }
                 ],
@@ -31,11 +31,11 @@ export default async function handler(req, res) {
         const data = await response.json();
         
         if (data.choices && data.choices[0]) {
-            return res.status(200).json({ prompt: data.choices[0].message.content });
+            res.status(200).json({ prompt: data.choices[0].message.content });
         } else {
-            return res.status(500).json({ error: "Erro na resposta da Groq" });
+            res.status(500).json({ error: data.error?.message || "Erro na resposta da Groq" });
         }
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Erro de conexão com a IA" });
     }
 }
