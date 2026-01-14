@@ -3,113 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pront.ai | Engenharia de Prompt Magistral</title>
+    <title>pront.ai | Engenharia de Prompt Profissional</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="auth-false">
 
     <div id="upgradeModal" class="modal hidden">
-        <div class="modal-content pricing-card">
-            <button class="close-modal" id="closeModal">&times;</button>
-            <div class="badge-promo">PROMOÇÃO DE LANÇAMENTO</div>
-            <h2>Torne-se <span class="blue">PRO</span></h2>
-            <p>Seus usos gratuitos acabaram. Libere o poder ilimitado da nossa IA.</p>
-            <div class="price-box">
-                <span class="old-price">R$ 49,90</span>
-                <span class="current-price">R$ 19,90<small>/mês</small></span>
+        <div class="modal-backdrop"></div>
+        <div class="modal-content pricing-card-pro">
+            <button class="close-modal" id="closeModal"><i data-lucide="x"></i></button>
+            
+            <div class="promo-header">
+                <div class="badge-promo-animated">
+                    <i data-lucide="sparkles"></i> OFERTA DE LANÇAMENTO
+                </div>
             </div>
-            <ul class="features">
-                <li><i data-lucide="check"></i> Usos Ilimitados</li>
-                <li><i data-lucide="check"></i> IA Llama 3.3 (Alta Velocidade)</li>
-                <li><i data-lucide="check"></i> Histórico em Nuvem</li>
+            
+            <h2>Desbloqueie o Potencial <span class="gradient-text-pro">ILIMITADO</span></h2>
+            <p class="promo-sub">Seus 2 usos gratuitos terminaram. Evolua para profissional.</p>
+            
+            <div class="price-container">
+                <div class="price-box">
+                    <span class="old-price">R$ 49,90</span>
+                    <div class="current-price-wrapper">
+                        <span class="currency">R$</span>
+                        <span class="amount">19,90</span>
+                        <span class="period">/mês</span>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="features-list">
+                <li><span class="check-icon"><i data-lucide="check"></i></span> Gerações Ilimitadas</li>
+                <li><span class="check-icon"><i data-lucide="check"></i></span> Modelo Llama 3.3 Turbo</li>
+                <li><span class="check-icon"><i data-lucide="check"></i></span> Histórico Salvo na Nuvem</li>
+                <li><span class="check-icon"><i data-lucide="check"></i></span> Prioridade na Fila</li>
             </ul>
-            <button class="btn-upgrade-now">Assinar Plano Pro</button>
+
+            <button class="btn-upgrade-now-animated">
+                Assinar Plano Pro Agora
+                <i data-lucide="arrow-right"></i>
+            </button>
+            <p class="secure-text"><i data-lucide="shield-check"></i> Pagamento seguro. Cancele quando quiser.</p>
         </div>
     </div>
 
     <div id="loginOverlay" class="login-overlay">
-        <div class="login-card">
+        <div class="login-card-modern">
             <div class="logo-large">pront<span>.ai</span></div>
-            <h1>Engenharia de Prompt Profissional</h1>
-            <p>Faça login para começar a criar comandos magistrais.</p>
-            <button id="btnGoogle" class="google-btn">
+            <h1>Sua criatividade, arquitetada por IA.</h1>
+            <p>Entre para transformar ideias brutas em prompts de engenharia de elite.</p>
+            <button id="btnGoogle" class="google-btn-modern">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg" alt="Google">
-                Entrar com Google
+                Continuar com Google
             </button>
         </div>
     </div>
 
     <div class="app-shell">
         <aside class="sidebar">
-            <div class="sidebar-top">
+            <div class="sidebar-header">
                 <div class="logo">pront<span>.ai</span></div>
-                <button id="btnNew" class="btn-new-chat">
-                    <i data-lucide="plus-circle"></i>
-                    <span>Novo Prompt</span>
-                </button>
             </div>
             
-            <div class="history-container">
-                <span class="sidebar-label">CONTA E PLANO</span>
-                <div class="plan-status-card">
-                    <p id="planName">Plano: <b>Standart</b></p>
-                    <p id="usageCount">Usos: 0 / 2</p>
-                    <button id="btnOpenUpgrade" class="btn-mini-upgrade">Upgrade para PRO</button>
+            <div class="sidebar-content">
+                <div class="plan-widget-pro">
+                    <div class="plan-info">
+                        <span class="plan-label">SEU PLANO</span>
+                        <strong id="planName" class="plan-value">Standart</strong>
+                    </div>
+                    <div class="usage-tracker">
+                        <div class="usage-bar">
+                            <div id="usageProgress" class="usage-fill" style="width: 0%"></div>
+                        </div>
+                        <span id="usageCount" class="usage-text">0 / 2 usos</span>
+                    </div>
+                    <button id="btnOpenUpgrade" class="btn-sidebar-upgrade hidden">
+                        <i data-lucide="zap"></i> Liberar Ilimitado
+                    </button>
                 </div>
-                <span class="sidebar-label" style="margin-top: 20px;">RECENTES</span>
-                <div id="historyList" class="history-list"></div>
+
+                <div class="history-section">
+                    <span class="section-label">HISTÓRICO RECENTE</span>
+                    <div id="historyList" class="history-list"></div>
+                </div>
             </div>
 
-            <div class="user-profile-card">
-                <div class="profile-info">
-                    <img id="uAvatar" src="" alt="User">
-                    <div class="profile-text">
-                        <span id="uName">Carregando...</span>
-                    </div>
+            <div class="user-footer">
+                <div class="user-info">
+                    <img id="uAvatar" src="" alt="">
+                    <span id="uName" class="user-name">Carregando...</span>
                 </div>
-                <button id="btnLogout"><i data-lucide="log-out"></i></button>
+                <button id="btnLogout" class="btn-logout" title="Sair"><i data-lucide="log-out"></i></button>
             </div>
         </aside>
 
         <main class="main-content">
-            <div class="content-wrapper">
-                <header class="main-header">
+            <div class="content-container">
+                <header class="workspace-header">
                     <h1>O que vamos <span class="gradient-text">arquitetar</span> hoje?</h1>
-                    <p>IA Llama 3.3 de alta performance pronta para agir.</p>
+                    <p class="subtitle">Descreva seu objetivo. Nossa IA cuidará da engenharia do prompt.</p>
                 </header>
 
-                <div class="workspace">
-                    <div class="input-glass-card">
-                        <textarea id="promptInput" placeholder="Descreva sua ideia simples aqui..."></textarea>
-                        <div class="input-footer">
-                            <span class="char-count">Sistema Inteligente</span>
-                            <button id="btnGenerate" class="primary-button">
-                                <span>Gerar Prompt</span>
-                                <i data-lucide="zap"></i>
-                            </button>
-                        </div>
+                <div class="input-area-pro">
+                    <textarea id="promptInput" placeholder="Ex: Crie uma copy para anúncio de encapsulado focado em dores nas costas..."></textarea>
+                    <div class="input-actions">
+                        <span class="model-badge"><i data-lucide="cpu"></i> Llama 3.3 Active</span>
+                        <button id="btnGenerate" class="btn-generate-pro">
+                            Gerar Prompt Master <i data-lucide="sparkles"></i>
+                        </button>
                     </div>
-
-                    <div id="loader" class="loader-container hidden">
-                        <div class="ai-orbit"><div class="inner-orbit"></div></div>
-                        <p>Refinando algoritmos...</p>
-                    </div>
-
-                    <section id="resultBox" class="result-container hidden">
-                        <div class="result-card">
-                            <div class="result-header">
-                                <div class="badge">PROMPT ESTRUTURADO</div>
-                                <button id="btnCopy" class="btn-action"><i data-lucide="copy"></i> Copiar</button>
-                            </div>
-                            <div class="result-content">
-                                <pre id="outputText"></pre>
-                            </div>
-                        </div>
-                    </section>
                 </div>
+
+                <div id="loader" class="loader-container hidden">
+                    <div class="spinner-pro"></div>
+                    <p>Analisando contexto e estruturando blocos...</p>
+                </div>
+
+                <section id="resultBox" class="result-container hidden">
+                    <div class="result-card-pro">
+                        <div class="result-header">
+                            <div class="result-badge">
+                                <i data-lucide="check-circle-2"></i> PROMPT ESTRUTURADO
+                            </div>
+                            <div class="result-actions">
+                                <button id="btnNew" class="btn-icon-subtle" title="Limpar"><i data-lucide="eraser"></i></button>
+                                <button id="btnCopy" class="btn-copy-pro"><i data-lucide="copy"></i> Copiar</button>
+                            </div>
+                        </div>
+                        <div class="result-body">
+                            <pre id="outputText"></pre>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
