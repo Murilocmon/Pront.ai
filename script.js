@@ -3,27 +3,10 @@ const SUPABASE_URL = "https://xvkgjlnsavcclfnzblig.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2a2dqbG5zYXZjY2xmbnpibGlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0MDEzMTEsImV4cCI6MjA4Mzk3NzMxMX0.Vp9hVFBratBs-FOPDWh0LIFGN6D8A5AUcbb683oTkwc"; // Certifique-se de usar a 'anon public'
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ESTADO GLOBAL SEGURO
 let userData = { plan: 'Standart', usage: 0, history: [] };
 let currentUser = null;
 
-// ELEMENTOS DOM
-const dom = {
-    btnGenerate: document.getElementById('btnGenerate'),
-    btnLogout: document.getElementById('btnLogout'),
-    btnGoogle: document.getElementById('btnGoogle'),
-    promptInput: document.getElementById('promptInput'),
-    outputText: document.getElementById('outputText'),
-    resultBox: document.getElementById('resultBox'),
-    loader: document.getElementById('loader'),
-    planLabel: document.getElementById('planLabel'),
-    usageLabel: document.getElementById('usageLabel'),
-    progressBar: document.getElementById('progressBar'),
-    historyList: document.getElementById('historyList'),
-    upgradeModal: document.getElementById('upgradeModal')
-};
-
-// --- AUTENTICAÇÃO ---
+// --- GERENCIADOR DE AUTH ---
 _supabase.auth.onAuthStateChange(async (event, session) => {
     if (session) {
         currentUser = session.user;
@@ -37,17 +20,17 @@ _supabase.auth.onAuthStateChange(async (event, session) => {
     lucide.createIcons();
 });
 
-dom.btnGoogle.onclick = async () => {
-    await _supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
-};
-
-dom.btnLogout.onclick = async () => {
-    console.log("Saindo...");
+// Logout Direto e Funcional
+document.getElementById('btnLogout').onclick = async () => {
     await _supabase.auth.signOut();
     window.location.reload();
 };
 
-// --- BANCO DE DATOS ---
+document.getElementById('btnGoogle').onclick = async () => {
+    await _supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+};
+
+// --- SINCRONIZAÇÃO ---
 async function syncData() {
     if (!currentUser) return;
     let { data, error } = await _supabase.from('users').select('*').eq('id', currentUser.id).single();
@@ -63,35 +46,43 @@ async function syncData() {
 
 function updateUI() {
     const isPro = userData.plan === 'Pro';
-    dom.planLabel.innerText = userData.plan;
-    dom.planLabel.className = isPro ? 'pro-badge' : '';
+    const planLabel = document.getElementById('planLabel');
+    const progressBar = document.getElementById('progressBar');
+    
+    planLabel.innerText = userData.plan.toUpperCase();
     
     if (isPro) {
-        dom.usageLabel.innerText = "Ilimitado";
-        dom.progressBar.style.width = "100%";
+        document.getElementById('usageLabel').innerText = "ILIMITADO";
+        progressBar.style.width = "100%";
+        progressBar.style.background = "var(--accent)";
         document.getElementById('btnUpgrade').style.display = 'none';
+        document.getElementById('planCard').classList.add('pro-highlight');
     } else {
-        dom.usageLabel.innerText = `${userData.usage}/2`;
-        dom.progressBar.style.width = `${(userData.usage / 2) * 100}%`;
+        document.getElementById('usageLabel').innerText = `${userData.usage}/2`;
+        progressBar.style.width = `${(userData.usage / 2) * 100}%`;
     }
 
-    dom.historyList.innerHTML = userData.history.slice(-5).reverse().map(h => `<div class="hist-item">${h}</div>`).join('');
+    // Histórico com design limpo
+    document.getElementById('historyList').innerHTML = userData.history.slice(-5).reverse().map(h => `
+        <div class="hist-item" style="padding:10px; font-size:0.75rem; color:var(--text-dim); cursor:pointer; border-radius:8px; margin-bottom:5px; background:rgba(255,255,255,0.02);" onclick="document.getElementById('promptInput').value='${h}'">
+            ${h.substring(0, 30)}...
+        </div>
+    `).join('');
 }
 
 // --- GERAÇÃO IA ---
-dom.btnGenerate.onclick = async () => {
-    const input = dom.promptInput.value.trim();
-    if (!input || dom.btnGenerate.disabled) return;
+document.getElementById('btnGenerate').onclick = async () => {
+    const input = document.getElementById('promptInput').value.trim();
+    if (!input) return;
 
     if (userData.plan === 'Standart' && userData.usage >= 2) {
-        dom.upgradeModal.classList.remove('hidden');
+        document.getElementById('upgradeModal').classList.remove('hidden');
         return;
     }
 
-    dom.loader.classList.remove('hidden');
-    dom.resultBox.classList.add('hidden');
-    dom.btnGenerate.disabled = true;
-
+    // Loader Visual
+    document.getElementById('btnGenerate').innerText = "PROCESSANDO...";
+    
     try {
         const res = await fetch('/api/generate', {
             method: 'POST',
@@ -101,10 +92,10 @@ dom.btnGenerate.onclick = async () => {
         const data = await res.json();
 
         if (data.prompt) {
-            dom.outputText.innerText = data.prompt;
-            dom.resultBox.classList.remove('hidden');
+            document.getElementById('outputText').innerText = data.prompt;
+            document.getElementById('resultBox').classList.remove('hidden');
 
-            // ATUALIZAÇÃO NO SUPABASE (Fix da contagem)
+            // Salvar no Banco
             const newHistory = [...userData.history, input].slice(-10);
             const { data: updated } = await _supabase.from('users')
                 .update({ usage: userData.usage + 1, history: newHistory })
@@ -116,17 +107,17 @@ dom.btnGenerate.onclick = async () => {
             }
         }
     } catch (e) {
-        alert("Erro na geração.");
+        alert("Erro na conexão.");
     } finally {
-        dom.loader.classList.add('hidden');
-        dom.btnGenerate.disabled = false;
+        document.getElementById('btnGenerate').innerHTML = `GERAR AGORA <i data-lucide="zap"></i>`;
+        lucide.createIcons();
     }
 };
 
-// UI EVENTS
-document.getElementById('btnUpgrade').onclick = () => dom.upgradeModal.classList.remove('hidden');
-document.getElementById('closeModal').onclick = () => dom.upgradeModal.classList.add('hidden');
+// Modais
+document.getElementById('btnUpgrade').onclick = () => document.getElementById('upgradeModal').classList.remove('hidden');
+document.getElementById('closeModal').onclick = () => document.getElementById('upgradeModal').classList.add('hidden');
 document.getElementById('btnCopy').onclick = () => {
-    navigator.clipboard.writeText(dom.outputText.innerText);
+    navigator.clipboard.writeText(document.getElementById('outputText').innerText);
     alert("Copiado!");
 };
