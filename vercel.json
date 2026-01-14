@@ -1,6 +1,8 @@
 {
   "version": 2,
+  "name": "pront-ai",
   "rewrites": [
-    { "source": "/api/generate", "destination": "/api/generate.js" }
+    { "source": "/api/generate", "destination": "/api/generate.js" },
+    { "source": "/(.*)", "destination": "/$1" }
   ]
 }
