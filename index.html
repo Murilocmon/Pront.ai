@@ -13,16 +13,16 @@
 
     <div id="upgradeModal" class="modal hidden">
         <div class="modal-backdrop"></div>
-        <div class="modal-card pro-highlight">
+        <div class="modal-card pro-glow">
             <button id="closeModal" class="btn-close">&times;</button>
-            <div class="promo-badge">OFERTA DE LANÇAMENTO</div>
+            <div class="badge-promo">PROMOÇÃO DE LANÇAMENTO</div>
             <h2>Nível <span class="gradient-pro">ARK-PRO</span></h2>
-            <p>Seus usos gratuitos acabaram. Desbloqueie a potência máxima agora.</p>
+            <p>Limite atingido. Desbloqueie o poder ilimitado agora.</p>
             <div class="price-box">
                 <span class="old-price">R$ 49,90</span>
                 <h1>R$ 19,90<small>/mês</small></h1>
             </div>
-            <button class="btn-upgrade-final">ASSINAR AGORA</button>
+            <button class="btn-pay-final">QUERO ACESSO ILIMITADO</button>
         </div>
     </div>
 
@@ -30,7 +30,6 @@
         <div class="login-card">
             <div class="logo">pront<span>.ai</span></div>
             <h1>Onde a IA vira Engenharia.</h1>
-            <p>Transforme ideias em comandos de elite.</p>
             <button id="btnGoogle" class="btn-google">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg">
                 Entrar com Google
@@ -38,28 +37,26 @@
         </div>
     </div>
 
-    <div class="app-shell">
+    <div class="app-layout">
         <aside class="sidebar">
             <div class="logo">pront<span>.ai</span></div>
             
             <div id="planCard" class="plan-card">
-                <div class="plan-info">
+                <div class="plan-meta">
                     <span id="planLabel">STANDART</span>
                     <span id="usageLabel">0/2</span>
                 </div>
-                <div class="progress-bar-bg">
-                    <div id="progressBar" class="progress-bar-fill"></div>
-                </div>
-                <button id="btnUpgrade" class="btn-upgrade-sidebar">DESBLOQUEAR PRO</button>
+                <div class="bar-bg"><div id="progressBar" class="bar-fill"></div></div>
+                <button id="btnUpgrade" class="btn-sidebar-pro">UPGRADE PARA PRO</button>
             </div>
 
             <div class="history-section">
-                <label>HISTÓRICO</label>
+                <label>RECENTES</label>
                 <div id="historyList"></div>
             </div>
 
-            <div class="user-profile">
-                <div class="u-meta">
+            <div class="user-footer">
+                <div class="u-info">
                     <img id="uAvatar" src="">
                     <span id="uName">...</span>
                 </div>
@@ -70,25 +67,25 @@
         <main class="main-content">
             <div class="workspace">
                 <header class="hero">
-                    <h1>Arquitetura de <span class="gradient-text">Prompts</span></h1>
+                    <h1>Arquitetura de <span class="blue-text">Prompts</span></h1>
                 </header>
 
-                <div class="input-container-glass">
-                    <textarea id="promptInput" placeholder="Descreva sua ideia simples aqui..."></textarea>
+                <div class="input-glass">
+                    <textarea id="promptInput" placeholder="Sua ideia bruta aqui..."></textarea>
                     <div class="input-footer">
-                        <span id="aiBadge" class="ai-badge">MODELO: LLAMA BÁSICO</span>
+                        <span id="aiBadge" class="ai-badge">MODELO BÁSICO</span>
                         <button id="btnGenerate">GERAR PROMPT <i data-lucide="zap"></i></button>
                     </div>
                 </div>
 
                 <div id="loader" class="loader-box hidden">
-                    <div class="spinner-pro"></div>
-                    <p>Processando engenharia...</p>
+                    <div class="spinner"></div>
+                    <p>Processando algoritmos...</p>
                 </div>
 
                 <div id="resultBox" class="result-area hidden">
-                    <div class="result-header">
-                        <span>PROMPT GERADO</span>
+                    <div class="res-header">
+                        <span>PROMPT ESTRUTURADO</span>
                         <button id="btnCopy">COPIAR</button>
                     </div>
                     <div id="outputText"></div>
